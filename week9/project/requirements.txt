@@ -1,3 +1,3 @@
-To run it, you will need to import the following packages, csv, argparse, tabulate, sys, time.
+To run it, you will need to import the following packages, csv, re, tabulate, sys, time.
 You also need a csv file like the example I gave you.
 The command to run it is python project.py csvfile.csv
