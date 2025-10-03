@@ -3,16 +3,19 @@ from tabulate import tabulate
 import sys
 import time
 import re
+import threading
+
+
+timeout_event = threading.Event()
 
 
 class Quiz:
     data = []
 
-    def __init__(self, file, duration):
+    def __init__(self, file):
         self._file = file
-        self._duration = duration
         if not file.endswith('.csv'):
-            raise FileNotFoundError('Didn\'t find a csv file')
+            sys.exit('Didn\'t find a csv file')
 
     def __str__(self):
         '''
@@ -32,7 +35,7 @@ class Quiz:
             reader = csv.DictReader(f)
             headers = reader.fieldnames
             if len(headers) != 2:
-                raise ValueError('2 headers required')
+                raise sys.exit('2 headers required')
             for row in reader:
                 # Append the question and answer to the dict and also set answered to false
                 Quiz.data.append({
@@ -43,23 +46,42 @@ class Quiz:
          
 
 def main():
-    
-    quiz = Quiz('example.csv', )
+    time_limit = input('Time limit (example: 3:25 for 3 min and 25 secs): ').strip().lower()
+    time_limit = validate_countdown(time_limit)
+
+    timer_thread = threading.Thread(target=countdown, args=(time_limit,), daemon=True)
+    timer_thread.start()
+
+    quiz = Quiz('example.csv')
     quiz.create_dict()
-    print(quiz)
+
+    while not timeout_event.is_set():
+        try:
+            #print(quiz)
+            s = input('s: ')
+            b = input('b: ')
+        except KeyboardInterrupt:
+            # Print out the user's score
+            print('something')
+            sys.exit()
 
 
-def countdown():
-    time_limit = int(input('Time limit (example: 3:25 for 3 min and 25 secs): ').strip().lower())
+def validate_countdown(time_limit):
     if time_limit == 'inf':
         return 999999
-    elif match := re.search(r'(\d)*:(0\d|\d{2})', time_limit):
-        min = eval(match.group(1))
-        sec = eval(match.group(2))
-
-        return min * 60 + sec
+    elif match := re.search(r'^(\d*):(0\d|\d{2})$', time_limit):
+        min = int(match.group(1))
+        secs = int(match.group(2))
+        return min * 60 + secs
     else:
-        raise ValueError('Invalid format')
+        sys.exit('Invalid format')
+
+
+def countdown(time_limit):
+    while time_limit > 0:
+        time.sleep(1)
+        time_limit -= 1
+    timeout_event.set()
 
 
 if __name__ == '__main__':
