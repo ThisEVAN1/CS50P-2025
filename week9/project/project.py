@@ -20,12 +20,6 @@ class Quiz:
         if not file.endswith('.csv'):
             sys.exit('Didn\'t find a csv file')
 
-    def __str__(self):
-        '''
-        Return the data dict.
-        '''
-        return str(tabulate(self.visual_data, headers='keys', tablefmt='grid'))
-
     def create_dict(self):
         """
 +       Reads the CSV file specified by self._file, checks for exactly two headers,
@@ -68,6 +62,23 @@ class Quiz:
                     'answer': '???'
                 })
 
+    def print_data(self, type='data', set_tabulate=False):
+        '''
+        Prints the data.
+        The data can be data or visual_data.
+        It can print the tabulated data if set to true.
+        '''
+        if type == 'data' and set_tabulate == False:
+            print(self.data)
+        elif type == 'data' and set_tabulate == True:
+            print(tabulate(self.data, headers='keys', tablefmt='grid'))
+        elif type == 'visual_data' and set_tabulate == False:
+            print(self.visual_data)
+        elif type == 'visual_data' and set_tabulate == True:
+            print(tabulate(self.visual_data, headers='keys', tablefmt='grid'))
+        else:
+            sys.exit('print_data parameter error')
+
 
 def main():
     # Gets the time and makes sure it is in the right format
@@ -85,8 +96,7 @@ def main():
 
     while not timeout_event.is_set():
         try:
-            print(quiz)
-            print(quiz.visual_data)
+            quiz.print_data()
             sys.exit()
         except KeyboardInterrupt:
             # Print out the user's score
