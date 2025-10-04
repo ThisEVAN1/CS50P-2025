@@ -1,3 +1,4 @@
 To run it, you will need to import the following packages, csv, re, tabulate, sys, time, threading.
+To be able to run the pytest, the modules you will need are pytest, builtins, and the functions in the project.py file.
 You also need a csv file like the example I gave you.
 The command to run it is python project.py csvfile.csv
