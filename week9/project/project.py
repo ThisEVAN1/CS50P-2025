@@ -10,7 +10,10 @@ timeout_event = threading.Event()
 
 
 class Quiz:
+    # All the data
     data = []
+    # The data in which the player is supposed to see
+    visual_data = []
 
     def __init__(self, file):
         self._file = file
@@ -19,9 +22,9 @@ class Quiz:
 
     def __str__(self):
         '''
-        Return the data dict
+        Return the data dict.
         '''
-        return str(self.data)
+        return str(tabulate(self.visual_data, headers='keys', tablefmt='grid'))
 
     def create_dict(self):
         """
@@ -43,23 +46,48 @@ class Quiz:
                     headers[1]: row[headers[1]].strip().lower(),
                     'answered': False
                 })
-         
+
+    def change_visual_data(self):
+        '''
+        Change to visual_data.
+        If the question has been answered then add the answer to the table.
+        If it hasn't been answered then make it so it shows nothing on the answer part of the table.
+        '''
+        for dict in self.data:
+            # Append the question to the table and also the answer but only if it has already been answered correctly.
+            if self.data[dict['answered']] == True:
+                # Append the question and answer
+                Quiz.visual_data.append({
+                    'question': dict['question'],
+                    'answer': dict['answer']
+                })
+            else:
+                # Append the question but nothing as the answer
+                Quiz.visual_data.append({
+                    'question': dict['question'],
+                    'answer': '???'
+                })
+
 
 def main():
-    time_limit = input('Time limit (example: 3:25 for 3 min and 25 secs): ').strip().lower()
+    # Gets the time and makes sure it is in the right format
+    time_limit = input('Time limit: ').strip().lower()
     time_limit = validate_countdown(time_limit)
 
+    # Creates a thread so that the timer can count down without pausing the main funciton
     timer_thread = threading.Thread(target=countdown, args=(time_limit,), daemon=True)
     timer_thread.start()
 
+    # Starts the quiz
     quiz = Quiz('example.csv')
     quiz.create_dict()
+    quiz.change_visual_data()
 
     while not timeout_event.is_set():
         try:
-            #print(quiz)
-            s = input('s: ')
-            b = input('b: ')
+            print(quiz)
+            print(quiz.visual_data)
+            sys.exit()
         except KeyboardInterrupt:
             # Print out the user's score
             print('something')
@@ -67,6 +95,9 @@ def main():
 
 
 def validate_countdown(time_limit):
+    '''
+    Makes sure that the time is in the valid format.
+    '''
     if time_limit == 'inf':
         return 999999
     elif match := re.search(r'^(\d*):(0\d|\d{2})$', time_limit):
@@ -78,6 +109,9 @@ def validate_countdown(time_limit):
 
 
 def countdown(time_limit):
+    '''
+    Creates a timer that counts down from the amount of time given.
+    '''
     while time_limit > 0:
         time.sleep(1)
         time_limit -= 1
