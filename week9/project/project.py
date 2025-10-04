@@ -105,6 +105,9 @@ class Quiz:
 
     @property
     def score(self):
+        '''
+        Returns how many questions were answered correctly and the total amount of questions in a tuple
+        '''
         _score = 0
         _total_questions = 0
 
