@@ -6,6 +6,8 @@ import re
 import threading
 
 
+global file_name
+file_name = 'example.csv' # Replace the example.csv with your own csv file
 timeout_event = threading.Event()
 
 
@@ -114,6 +116,7 @@ class Quiz:
         return (_score, _total_questions)
 
 def main():
+    global file_name
     # Gets the time and makes sure it is in the right format
     time_limit = input('Time limit: ').strip().lower()
     time_limit = validate_countdown(time_limit)
@@ -123,7 +126,7 @@ def main():
     timer_thread.start()
 
     # Starts the quiz
-    quiz = Quiz('example.csv')
+    quiz = Quiz(file_name)
     quiz.create_data()
 
     while not timeout_event.is_set():
