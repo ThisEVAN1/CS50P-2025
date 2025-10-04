@@ -91,6 +91,16 @@ class Quiz:
         for data in self.data:
             if user_answer == data['answer']:
                 data['correct'] = True
+
+        # Check if all the answers have been answered
+        for data in self.data:
+            # If the answer hasn't been already answered then exit out of the function
+            if data['correct'] == False:
+                return
+
+        # Since all answers have been answered, tell the user they won with their score then exit
+        print(f'Good job! You got all of them correct!')
+        sys.exit()
             
 
 def main():
@@ -109,6 +119,7 @@ def main():
     while not timeout_event.is_set():
         try:
             quiz.change_visual_data()
+            print('\033[H\033[J', end='')
             quiz.print_data(type='visual_data', set_tabulate=True)
             quiz.prompt()
         except KeyboardInterrupt:
