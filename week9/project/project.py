@@ -20,7 +20,7 @@ class Quiz:
         if not file.endswith('.csv'):
             sys.exit('Didn\'t find a csv file')
 
-    def create_dict(self):
+    def create_data(self):
         """
 +       Reads the CSV file specified by self._file, checks for exactly two headers,
 +       and populates the Quiz.data list with dictionaries containing the question,
@@ -38,7 +38,7 @@ class Quiz:
                 Quiz.data.append({
                     headers[0]: row[headers[0]].strip().lower(),
                     headers[1]: row[headers[1]].strip().lower(),
-                    'answered': False
+                    'correct': False
                 })
 
     def change_visual_data(self):
@@ -47,18 +47,20 @@ class Quiz:
         If the question has been answered then add the answer to the table.
         If it hasn't been answered then make it so it shows nothing on the answer part of the table.
         '''
-        for dict in self.data:
+        # Clear it to get a new list
+        self.visual_data.clear()
+        for data in self.data:
             # Append the question to the table and also the answer but only if it has already been answered correctly.
-            if self.data[dict['answered']] == True:
+            if data['correct'] == True:
                 # Append the question and answer
                 Quiz.visual_data.append({
-                    'question': dict['question'],
-                    'answer': dict['answer']
+                    'question': data['question'],
+                    'answer': data['answer']
                 })
             else:
                 # Append the question but nothing as the answer
                 Quiz.visual_data.append({
-                    'question': dict['question'],
+                    'question': data['question'],
                     'answer': '???'
                 })
 
@@ -79,6 +81,17 @@ class Quiz:
         else:
             sys.exit('print_data parameter error')
 
+    def prompt(self):
+        '''
+        Promp the user for the answer
+        '''
+        user_answer = input('Answer: ').strip().lower()
+
+        # Loop through all the data
+        for data in self.data:
+            if user_answer == data['answer']:
+                data['correct'] = True
+            
 
 def main():
     # Gets the time and makes sure it is in the right format
@@ -91,13 +104,13 @@ def main():
 
     # Starts the quiz
     quiz = Quiz('example.csv')
-    quiz.create_dict()
-    quiz.change_visual_data()
+    quiz.create_data()
 
     while not timeout_event.is_set():
         try:
-            quiz.print_data()
-            sys.exit()
+            quiz.change_visual_data()
+            quiz.print_data(type='visual_data', set_tabulate=True)
+            quiz.prompt()
         except KeyboardInterrupt:
             # Print out the user's score
             print('something')
