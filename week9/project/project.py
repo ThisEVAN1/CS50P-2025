@@ -99,9 +99,20 @@ class Quiz:
                 return
 
         # Since all answers have been answered, tell the user they won with their score then exit
-        print(f'Good job! You got all of them correct!')
+        print(f'Good job! You got {self.score[0]} out of {self.score[1]}!')
         sys.exit()
-            
+
+    @property
+    def score(self):
+        _score = 0
+        _total_questions = 0
+
+        for data in self.data:
+            _total_questions += 1
+            if data['correct'] == True:
+                _score += 1
+
+        return (_score, _total_questions)
 
 def main():
     # Gets the time and makes sure it is in the right format
@@ -119,13 +130,14 @@ def main():
     while not timeout_event.is_set():
         try:
             quiz.change_visual_data()
-            print('\033[H\033[J', end='')
+            print('\033[H\033[J', end='') # Clears the screen (it is the same as using clear in the terminal)
             quiz.print_data(type='visual_data', set_tabulate=True)
             quiz.prompt()
         except KeyboardInterrupt:
-            # Print out the user's score
-            print('something')
-            sys.exit()
+            break
+
+    # Print out the user's score
+    print(f'You got {quiz.score[0]} out of {quiz.score[1]}! That\'s {round(quiz.score[0] / quiz.score[1] * 100)}%')
 
 
 def validate_countdown(time_limit):
