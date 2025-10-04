@@ -10,15 +10,14 @@ timeout_event = threading.Event()
 
 
 class Quiz:
-    # All the data
-    data = []
-    # The data in which the player is supposed to see
-    visual_data = []
-
     def __init__(self, file):
         self._file = file
         if not file.endswith('.csv'):
             sys.exit('Didn\'t find a csv file')
+        # All the data (instance attributes to avoid shared mutable state)
+        self.data = []
+        # The data in which the player is supposed to see
+        self.visual_data = []
 
     def create_data(self):
         """
@@ -35,7 +34,7 @@ class Quiz:
                 raise sys.exit('2 headers required')
             for row in reader:
                 # Append the question and answer to the dict and also set answered to false
-                Quiz.data.append({
+                self.data.append({
                     headers[0]: row[headers[0]].strip().lower(),
                     headers[1]: row[headers[1]].strip().lower(),
                     'correct': False
@@ -53,13 +52,13 @@ class Quiz:
             # Append the question to the table and also the answer but only if it has already been answered correctly.
             if data['correct'] == True:
                 # Append the question and answer
-                Quiz.visual_data.append({
+                self.visual_data.append({
                     'question': data['question'],
                     'answer': data['answer']
                 })
             else:
                 # Append the question but nothing as the answer
-                Quiz.visual_data.append({
+                self.visual_data.append({
                     'question': data['question'],
                     'answer': '???'
                 })
