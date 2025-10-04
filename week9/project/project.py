@@ -134,6 +134,7 @@ def main():
             quiz.print_data(type='visual_data', set_tabulate=True)
             quiz.prompt()
         except KeyboardInterrupt:
+            print()
             break
 
     # Print out the user's score
